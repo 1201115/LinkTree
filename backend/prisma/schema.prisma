@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  username     String   @unique
+  passwordHash String
+  displayName  String
+  bio          String?
+  avatarUrl    String?
+  backgroundUrl String?
+  theme        String   @default("aurora")
+  accentHue    Int      @default(260)
+  overlayOpacity Float  @default(0.35)
+  overlayBlur  Int      @default(18)
+  createdAt    DateTime @default(now())
+
+  links   Link[]
+  places  Place[]
+}
+
+model Link {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  url       String
+  icon      String?
+  order     Int      @default(0)
+  isVisible Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Place {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  countryCode String?
+  lat         Float
+  lng         Float
+  visitedAt   DateTime?
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
